@@ -1,23 +1,35 @@
-var express = require('express.io');
+// MONGODB //
 var mongodb = require('mongodb');
 var mongoClient = mongodb.MongoClient;
 var database = null;
-mongoClient.connect('mongodb://localhost:20000/facebyte',function(error,_database){
+
+mongoClient.connect('mongodb://localhost:20000/facebyte',mongodbClientConnect_handler);
+
+function mongodbClientConnect_handler (error,_database){
 	if (error) {
 		throw error;
 	} else {
 		database = _database;
 	}
-});
+}
+// HTTP/EXPRESS //
+var express = require('express.io');
 var http = express();
+
 http.http().io();
+http.listen(process.env.PORT||30000);
+
 http.get('/',httpGet_index);
 http.get('/users',httpGet_users);
-http.post('/users/:username/:password/keys/:public',httpPost_users);
-http.listen(process.env.PORT||30000);
+http.post('/users/:username/:password',httpPost_users);
+http.post('/users/tokens/:username/:password',httpPost_usersTokens);
+http.post('/users/photos/:facebyte/:token',httpPost_usersPhotos);
+
 function httpGet_index (request,response) {
+	// jkhasdkjhaksjdfkhjsd
 	response.send('facebyte.io\n');
 }
+
 function httpGet_users (request,response) {
 	if (database) {
 		var users = database.collection('users');
@@ -31,22 +43,83 @@ function httpGet_users (request,response) {
 		});
 	}
 }
+
 function httpPost_users (request,response) {
 	if (database) {
-		var cypher = null;
-		var authorizationKey = cypher;
 		var users = database.collection('users');
-		var user = {username:request.params.username,password:request.params.password,keys:{public:request.params.keys.public,authorization:authorizationKey}};
+		var user = {
+			username: request.params.username,
+			password: request.params.password
+		};
 		users.insert(user,function usersInsert_callback (error,objects) {
 			if (error) {
 				console.warn(error.message);
-				response.send('{}');
-			}
-			if (error && error.message.indexOf('E11000 ') !== -1) {
-				console.warn(error.message);
 				response.send('{"error":"username already exists."}');
+			} else {
+				var token = new Token()();
+				users.update(
+					{username:user.username,password:user.password},
+					{$set:{token:token}},
+					function usersUpdate_tokenCallback (error,objects) {
+						if (error) {
+							console.warn(error.message);
+							response.send('{"error":"not authorized"}');
+						} else {
+							response.send(JSON.stringify({token:token}));
+						}
+					}
+				);
 			}
-			response.send(JSON.stringify(objects));
 		});
+	}
+}
+
+function httpPost_usersTokens (request,response) {
+	if (database) {
+		var users = database.collection('users');
+		var user = {
+			username: request.params.username,
+			password: request.params.password
+		};
+		var token = new Token()();
+		users.update(
+			{username:user.username,password:user.password},
+			{$set:{token:token}},
+			function usersUpdate_tokenCallback (error,objects) {
+				if (error) {
+					console.warn(error.message);
+					response.send('{"error":"not authorized"}');
+				} else {
+					response.send(JSON.stringify({token:token}));
+				}
+			}
+		);
+	}
+}
+
+function httpPost_usersPhotos (request,response) {
+	if (database) {
+		var users = database.collection('users');
+		var user = {
+			token: request.params.token,
+			facebyte: request.params.facebyte
+		};
+		users.update(
+			{token:user.token},
+			{$set:{facebyte:request.params.facebyte}},
+			function usersUpdate_callback (error,objects) {
+				if (error) {
+					console.warn(error.message);
+					response.send('{"error":"not authorized"}');
+				}
+				response.send(JSON.stringify(objects));
+			}
+		);
+	}
+}
+
+function Token () {
+	return function token () {
+		return new Date().getTime().toString();
 	}
 }
