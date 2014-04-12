@@ -12,7 +12,7 @@ function mongodbClientConnect_handler (error,_database){
 		database = _database;
 	}
 }
-// HTTP/EXPRESS //
+// EXPRESS //
 var express = require('express.io');
 var http = express();
 
@@ -25,9 +25,18 @@ http.post('/users/:username/:password',httpPost_users);
 http.post('/users/tokens/:username/:password',httpPost_usersTokens);
 http.post('/users/photos/:facebyte/:token',httpPost_usersPhotos);
 
+// FRONT-END //
+var html = (function(){
+	var h = '<!doctype html><html><body>';
+	h += '<script type="text/javascript" src="./facebyte-core.js"></script>';
+	h += '</body></html>';
+	return h;
+}())
+
+// CLASSES //
 function httpGet_index (request,response) {
 	// jkhasdkjhaksjdfkhjsd
-	response.send('facebyte.io\n');
+	response.send(new FrontEnd()());
 }
 
 function httpGet_users (request,response) {
@@ -121,5 +130,11 @@ function httpPost_usersPhotos (request,response) {
 function Token () {
 	return function token () {
 		return new Date().getTime().toString();
+	}
+}
+
+function FrontEnd () {
+	return function () {
+		return html;
 	}
 }
