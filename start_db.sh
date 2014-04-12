@@ -1,4 +1,5 @@
 #!/bin/sh
 
 MONGOD=$1
-$MONGOD --port 20000 --dbpath ./mongodb.data --directoryperdb
+PORT=$2
+$MONGOD --port $PORT --dbpath ./mongodb.data --directoryperdb
