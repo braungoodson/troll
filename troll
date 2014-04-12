@@ -11,5 +11,8 @@ HTTP_PORT=$4
 # create_db.sh <path-to-mongo> <database-port>
 ./create_db.sh $MONGO_BIN/mongo $DATA_PORT
 
+# npm install
+$NODEJS_BIN/npm install
+
 # node index.js
 $NODEJS_BIN/node index.js &
