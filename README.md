@@ -1,4 +1,9 @@
 troll
 ========
 
-	$ ./troll <path-to-mongodb-bin> <data-port> <path-to-node-bin> <http-port>
+	$ ./start_db.sh 
+
+	$ ./start_db.sh $MONGO_BIN/mongod $DATA_PORT &
+	$ ./create_db.sh $MONGO_BIN/mongo $DATA_PORT 
+	$ npm install
+	$ node index.js &

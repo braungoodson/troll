@@ -1,3 +1,5 @@
+console.log('troll');
+
 // MONGODB //
 var mongodb = require('mongodb');
 var mongoClient = mongodb.MongoClient;
