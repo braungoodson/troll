@@ -1,9 +1,11 @@
+console.log('troll');
+
 // MONGODB //
 var mongodb = require('mongodb');
 var mongoClient = mongodb.MongoClient;
 var database = null;
 
-mongoClient.connect('mongodb://localhost:20000/facebyte',mongodbClientConnect_handler);
+mongoClient.connect('mongodb://localhost:20000/troll',mongodbClientConnect_handler);
 
 function mongodbClientConnect_handler (error,_database){
 	if (error) {
@@ -23,7 +25,7 @@ http.get('/',httpGet_index);
 http.get('/users',httpGet_users);
 http.post('/users/:username/:password',httpPost_users);
 http.post('/users/tokens/:username/:password',httpPost_usersTokens);
-http.post('/users/photos/:facebyte/:token',httpPost_usersPhotos);
+http.post('/users/photos/:troll/:token',httpPost_usersPhotos);
 
 // FRONT-END //
 var html = (function(){
@@ -111,11 +113,11 @@ function httpPost_usersPhotos (request,response) {
 		var users = database.collection('users');
 		var user = {
 			token: request.params.token,
-			facebyte: request.params.facebyte
+			troll: request.params.troll
 		};
 		users.update(
 			{token:user.token},
-			{$set:{facebyte:request.params.facebyte}},
+			{$set:{troll:request.params.troll}},
 			function usersUpdate_callback (error,objects) {
 				if (error) {
 					console.warn(error.message);
