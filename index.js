@@ -21,26 +21,12 @@ var http = express();
 http.http().io();
 http.listen(process.env.PORT||30000);
 
-http.get('/',httpGet_index);
 http.get('/users',httpGet_users);
 http.post('/users/:username/:password',httpPost_users);
 http.post('/users/tokens/:username/:password',httpPost_usersTokens);
 http.post('/users/photos/:troll/:token',httpPost_usersPhotos);
 
-// FRONT-END //
-var html = (function(){
-	var h = '<!doctype html><html><body>';
-	h += '<script type="text/javascript" src="./facebyte-core.js"></script>';
-	h += '</body></html>';
-	return h;
-}())
-
 // CLASSES //
-function httpGet_index (request,response) {
-	// jkhasdkjhaksjdfkhjsd
-	response.send(new FrontEnd()());
-}
-
 function httpGet_users (request,response) {
 	if (database) {
 		var users = database.collection('users');
